@@ -1,7 +1,7 @@
 const os = require('os')
 const mediasoup = require('mediasoup')
 const totalThreads = os.cpus().length
-console.log(totalThreads)
+console.log(totalThreads + ' threads working')
 const config = require('./config/config')
 
 const createWorkers = () =>

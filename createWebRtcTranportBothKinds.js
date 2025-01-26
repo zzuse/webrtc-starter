@@ -5,8 +5,8 @@ const createWebRtcTransportBothKinds = router =>
       enalbleTcp: true,
       preferUdp: true,
       listenInfos: [
-        { protocol: 'udp', ip: '127.0.0.1' },
-        { protocol: 'tcp', ip: '127.0.0.1' }
+        { protocol: 'udp', ip: '0.0.0.0', announcedIp: '10.0.0.20' },
+        { protocol: 'tcp', ip: '0.0.0.0', announcedIp: '10.0.0.20' }
       ]
     })
     const clientTransportParams = {

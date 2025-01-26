@@ -11,7 +11,7 @@ const initConnect = () => {
   // setTimeout(function () {
   //   console.log('blalbabla')
   // }, 3000)
-  socket = io('https://localhost:8181')
+  socket = io('https://10.0.0.20:8181')
   connectButton.innerHTML = 'Connecting...'
   connectButton.disabled = true
   addSocketListeners()
@@ -36,7 +36,7 @@ const createProducer = async () => {
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: true
+      audio: false
     })
     console.log(localStream)
     localVideo.srcObject = localStream
@@ -57,7 +57,7 @@ const createProducer = async () => {
   producerTransport.on(
     'connect',
     async ({ dtlsParameters }, callback, errback) => {
-      console.log('4.3 client send dtls info on transport connect event!')
+      console.log('4.3 client send dtlsParameters on transport connect event: ')
       console.log(dtlsParameters)
       const resp = await socket.emitWithAck('connect-transport', {
         dtlsParameters
@@ -71,6 +71,7 @@ const createProducer = async () => {
     }
   )
   producerTransport.on('produce', async (parameters, callback, errback) => {
+    console.log({ parameters })
     console.log('4.6 client send media onTransport produce event has fired!')
     const { kind, rtpParameters } = parameters
     const resp = await socket.emitWithAck('start-producing', {
@@ -91,8 +92,9 @@ const createProducer = async () => {
 }
 
 const publish = async () => {
-  console.log('4.1 client publish feed')
+  console.log('4. client publish feed track is: ')
   const track = localStream.getVideoTracks()[0]
+  console.log({ track })
   producer = await producerTransport.produce({ track })
 }
 
@@ -160,6 +162,16 @@ const consume = async () => {
     console.log('Track is live!')
     await socket.emitWithAck('unpauseConsumer')
   }
+}
+
+const disconnect = async () => {
+  const closedResp = await socket.emitWithAck('close-all')
+  console.log('9. Closing!!')
+  if (closedResp === 'closeError') {
+    console.log('something happended on the server...')
+  }
+  producerTransport?.close()
+  consumerTransport?.close()
 }
 
 function addSocketListeners () {

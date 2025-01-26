@@ -67,3 +67,9 @@ Signal server needs to be running for 8 on
     - Once they are exchanged, tracks will exchange
 
 # CONNECTED!!
+
+# to run it
+
+```sh
+nodemon ./server.js
+```
