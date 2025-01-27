@@ -12,6 +12,7 @@ const initConnect = () => {
   //   console.log('blalbabla')
   // }, 3000)
   socket = io('https://10.0.0.20:8181')
+  console.log('1.1 client connecting')
   connectButton.innerHTML = 'Connecting...'
   connectButton.disabled = true
   addSocketListeners()
@@ -57,7 +58,7 @@ const createProducer = async () => {
   producerTransport.on(
     'connect',
     async ({ dtlsParameters }, callback, errback) => {
-      console.log('4.3 client send dtlsParameters on transport connect event: ')
+      console.log('4.1 client send dtlsParameters on transport connect event: ')
       console.log(dtlsParameters)
       const resp = await socket.emitWithAck('connect-transport', {
         dtlsParameters
@@ -67,12 +68,12 @@ const createProducer = async () => {
       } else if (resp === 'error') {
         errback()
       }
-      console.log('4.5 client transport connect ' + resp)
+      console.log('4.3 client transport connect ' + resp)
     }
   )
   producerTransport.on('produce', async (parameters, callback, errback) => {
+    console.log('4.5 client send media transport produce event has fired!')
     console.log({ parameters })
-    console.log('4.6 client send media onTransport produce event has fired!')
     const { kind, rtpParameters } = parameters
     const resp = await socket.emitWithAck('start-producing', {
       kind,
@@ -84,7 +85,7 @@ const createProducer = async () => {
       callback({ id: resp })
     }
     console.log(resp)
-    publishButton.disable = true
+    publishButton.disabled = true
     createConsButton.disabled = false
   })
   createProdButton.disabled = true
@@ -99,9 +100,11 @@ const publish = async () => {
 }
 
 const createConsumer = async () => {
+  console.log('5. create consumer transport')
   const data = await socket.emitWithAck('create-consumer-transport')
   const { id, iceParameters, iceCandidates, dtlsParameters } = data
-  //   console.log(data)
+  console.log(data)
+  console.log('5.1 client request server transport information')
   const transport = device.createRecvTransport({
     id,
     iceParameters,
@@ -120,7 +123,7 @@ const createConsumer = async () => {
   consumerTransport.on(
     'connect',
     async ({ dtlsParameters }, callback, errback) => {
-      console.log('5.1 Client Consume connect event has fired!')
+      console.log('6.3 client recv dtlsParameters on transport connect event: ')
       console.log(dtlsParameters)
       const resp = await socket.emitWithAck('connect-consumer-transport', {
         dtlsParameters
@@ -130,7 +133,7 @@ const createConsumer = async () => {
       } else if (resp === 'error') {
         errback()
       }
-      console.log(resp)
+      console.log('6.5 client transport connect ' + resp)
     }
   )
   createConsButton.disabled = true
@@ -138,9 +141,11 @@ const createConsumer = async () => {
 }
 
 const consume = async () => {
+  console.log('6. Client subscribe to feed consume capability')
   const consumerParams = await socket.emitWithAck('consume-media', {
     rtpCapabilities: device.rtpCapabilities
   })
+  console.log('6.1 client send capabilities to server')
   if (consumerParams === 'noProducer') {
     console.log('There is no producer set up to ')
   } else if (consumerParams === 'cannotConsume') {
@@ -148,6 +153,7 @@ const consume = async () => {
   } else {
     consumer = await consumerTransport.consume(consumerParams)
     const { track } = consumer
+    console.log('6.7 client prepare consuming track: ')
     console.log(track)
     track.addEventListener('ended', () => {
       console.log('track has ended')
@@ -159,7 +165,8 @@ const consume = async () => {
       console.log('track has unmuted')
     }
     remoteVideo.srcObject = new MediaStream([track])
-    console.log('Track is live!')
+    console.log('7 client ready and unpause ')
+    console.log('7.1 Track is live!')
     await socket.emitWithAck('unpauseConsumer')
   }
 }
@@ -167,6 +174,7 @@ const consume = async () => {
 const disconnect = async () => {
   const closedResp = await socket.emitWithAck('close-all')
   console.log('9. Closing!!')
+  console.log('9.1 close all')
   if (closedResp === 'closeError') {
     console.log('something happended on the server...')
   }
@@ -176,7 +184,7 @@ const disconnect = async () => {
 
 function addSocketListeners () {
   socket.on('connect', () => {
-    console.log('1.2 client connected successful')
+    console.log('1.3 client connected successful')
     connectButton.innerHTML = 'Connected'
     deviceButton.disabled = false
   })

@@ -18,7 +18,7 @@ const socketio = require('socket.io')
 const mediasoup = require('mediasoup')
 const createWorkers = require('./createWorkers')
 const config = require('./config/config')
-const createWebRtcTransportBothKinds = require('./createWebRtcTranportBothKinds')
+const createWebRtcTransportBothKinds = require('./createWebRtcTransportBothKinds')
 
 //we changed our express setup so we can use https
 //pass the key and cert to createServer on https
@@ -43,7 +43,7 @@ const initMediaSoup = async () => {
 initMediaSoup()
 
 io.on('connect', socket => {
-  console.log('1.1 server been connected')
+  console.log('1.2 server been connected')
   let thisClientProducerTransport = null
   let thisClientProducer = null
   let thisClientConsumerTransport = null
@@ -63,13 +63,13 @@ io.on('connect', socket => {
   })
 
   socket.on('connect-transport', async (dtlsParameters, ack) => {
-    console.log('4.4 server get dtlsParameters info and finish connection: ')
+    console.log('4.2 server get dtlsParameters info and finish connection: ')
     console.log({ dtlsParameters })
     // dtlsParameters.role = 'server'
     try {
       await thisClientProducerTransport.connect(dtlsParameters)
       ack('success')
-      console.log('should goto producerTransport.produce, but not')
+      console.log('4.4 should goto producerTransport.produce')
     } catch (error) {
       console.log(error)
       ack('error')
@@ -77,7 +77,7 @@ io.on('connect', socket => {
   })
 
   socket.on('start-producing', async ({ kind, rtpParameters }, ack) => {
-    console.log('4.7 server start producing ')
+    console.log('4.6 server start producing ')
     try {
       thisClientProducer = await thisClientProducerTransport.produce({
         kind,
@@ -95,6 +95,7 @@ io.on('connect', socket => {
   })
 
   socket.on('create-consumer-transport', async ack => {
+    console.log('5.2 server return consumer transport')
     const { transport, clientTransportParams } =
       await createWebRtcTransportBothKinds(router)
     thisClientConsumerTransport = transport
@@ -102,9 +103,12 @@ io.on('connect', socket => {
   })
 
   socket.on('connect-consumer-transport', async (dtlsParameters, ack) => {
+    console.log('6.4 server get dtlsParameters info and finish connection: ')
+    console.log({ dtlsParameters })
     try {
       await thisClientConsumerTransport.connect(dtlsParameters)
-      ack('sucess')
+      ack('success')
+      console.log('6.6 should goto consumerTransport.consume')
     } catch (error) {
       console.log(error)
       ack('error')
@@ -112,10 +116,13 @@ io.on('connect', socket => {
   })
 
   socket.on('consume-media', async ({ rtpCapabilities }, ack) => {
-    console.log('6.2')
+    console.log('6.2 server recv consume capabilities: ')
+    // console.log(rtpCapabilities)
     if (!theProducer) {
       ack('noProducer')
-    } else if (!router.canConsume({ producerId: theProducer.id })) {
+    } else if (
+      !router.canConsume({ producerId: theProducer.id, rtpCapabilities })
+    ) {
       ack('cannotConsume')
     } else {
       thisClientConsumer = await thisClientConsumerTransport.consume({
@@ -131,17 +138,20 @@ io.on('connect', socket => {
         producerId: theProducer.id,
         id: thisClientConsumer.id,
         kind: thisClientConsumer.kind,
-        rtpParameters: thisClientConsumer.rtpCapabilities
+        rtpParameters: thisClientConsumer.rtpParameters
       }
       ack(consumerParams)
+      console.log('server give param to client ')
     }
   })
 
   socket.on('unpauseConsumer', async ack => {
+    console.log('7.2 resume consume...')
     await thisClientConsumer.resume()
   })
 
   socket.on('close-all', ack => {
+    console.log('9.2 close all...')
     try {
       thisClientConsumerTransport?.close()
       thisClientProducerTransport?.close()

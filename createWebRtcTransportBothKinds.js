@@ -11,7 +11,7 @@ const createWebRtcTransportBothKinds = router =>
     })
     const clientTransportParams = {
       id: transport.id,
-      iceParameters: transport,
+      iceParameters: transport.iceParameters,
       iceCandidates: transport.iceCandidates,
       dtlsParameters: transport.dtlsParameters
     }

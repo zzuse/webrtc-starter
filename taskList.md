@@ -4,6 +4,7 @@
 2. mkcert create-ca
 3. mkcert create-cert
 4. OPTIONAL: to run it locally, update the files with your local IP
+5. npm install express mediasoup socket.io
 
 # Steps in a WebRTC app
 
