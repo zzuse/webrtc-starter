@@ -25,7 +25,7 @@ const createWebRtcTransportBothKinds = require('./createWebRtcTransportBothKinds
 const expressServer = https.createServer(options, app)
 //create our socket.io server... it will listen to our express port
 const io = socketio(expressServer, {
-  cors: [`https://10.0.0.20:${config.port}`]
+  cors: [`https://zzuseturn.duckdns.org:${config.port}`]
 })
 
 let workers = null

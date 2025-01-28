@@ -11,7 +11,7 @@ const initConnect = () => {
   // setTimeout(function () {
   //   console.log('blalbabla')
   // }, 3000)
-  socket = io('https://10.0.0.20:8181')
+  socket = io('https://zzuseturn.duckdns.org:8181')
   console.log('1.1 client connecting')
   connectButton.innerHTML = 'Connecting...'
   connectButton.disabled = true
