@@ -146,7 +146,7 @@ io.on('connect', socket => {
   })
 
   socket.on('unpauseConsumer', async ack => {
-    console.log('7.2 resume consume...')
+    console.log('7.2 Server unpause and resume consume...')
     await thisClientConsumer.resume()
   })
 
