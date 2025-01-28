@@ -74,5 +74,5 @@ Signal server needs to be running for 8 on
 ```sh
 nodemon ./server.js
 or
-nohup nodemon ./server.js >a.out 2>&1 &
+nohup node ./server.js >a.out 2>&1 &
 ```
