@@ -2,7 +2,7 @@
 
 1. npm install mkcert -g
 2. mkcert create-ca
-3. mkcert create-cert and move all ca and cert to ./config
+3. mkcert create-cert (and move all ca and cert to ./config)
 4. OPTIONAL: to run it locally, update the files with your local IP (createWebRtcTransportBothKinds.js server.js index.html scripts.js)
 5. npm install express mediasoup socket.io
 
