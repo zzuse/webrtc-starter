@@ -2,8 +2,8 @@
 
 1. npm install mkcert -g
 2. mkcert create-ca
-3. mkcert create-cert
-4. OPTIONAL: to run it locally, update the files with your local IP
+3. mkcert create-cert and move all ca and cert to ./config
+4. OPTIONAL: to run it locally, update the files with your local IP (createWebRtcTransportBothKinds.js server.js index.html scripts.js)
 5. npm install express mediasoup socket.io
 
 # Steps in a WebRTC app
@@ -73,4 +73,6 @@ Signal server needs to be running for 8 on
 
 ```sh
 nodemon ./server.js
+or
+nohup nodemon ./server.js >a.out 2>&1 &
 ```
